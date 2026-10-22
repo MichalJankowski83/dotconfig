@@ -36,6 +36,18 @@ install_nvim() {
   case ":$PATH:" in *":$HOME/.local/bin:"*) ;; *) echo 'Add ~/.local/bin to PATH (export PATH="$HOME/.local/bin:$PATH")' ;; esac
 }
 
+install_tree_sitter() {
+  case "$(uname -m)" in
+    x86_64) arch=x64 ;;
+    aarch64|arm64) arch=arm64 ;;
+    *) echo "Unsupported arch for tree-sitter" >&2; return 1 ;;
+  esac
+  mkdir -p "$HOME/.local/bin"
+  curl -fsSL "https://github.com/tree-sitter/tree-sitter/releases/latest/download/tree-sitter-linux-${arch}.gz" \
+    | gunzip > "$HOME/.local/bin/tree-sitter"
+  chmod +x "$HOME/.local/bin/tree-sitter"
+}
+
 link() {  local src="$1" dst="$2"
   mkdir -p "$(dirname "$dst")"
   if [ -e "$dst" ] && [ ! -L "$dst" ]; then
@@ -46,7 +58,7 @@ link() {  local src="$1" dst="$2"
 }
 
 [ "${SKIP_PKGS:-0}" = "1" ] || install_pkgs
-[ "${SKIP_NVIM:-0}" = "1" ] || install_nvim
+[ "${SKIP_NVIM:-0}" = "1" ] || { install_nvim; install_tree_sitter; }
 
 # tmux
 link "$REPO_DIR/tmux/tmux.conf" "$CONFIG_DIR/tmux/tmux.conf"

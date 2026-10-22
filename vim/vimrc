@@ -1,0 +1,71 @@
+" Plugin-free vimrc so it works on any server
+
+set nocompatible
+filetype plugin indent on
+syntax on
+
+" UI
+set number relativenumber
+set cursorline
+set showcmd showmode
+set wildmenu wildmode=longest:full,full
+set laststatus=2
+set ruler
+set scrolloff=8
+set signcolumn=yes
+set nowrap
+set linebreak
+if has('termguicolors') | set termguicolors | endif
+set background=dark
+
+" Editing
+set encoding=utf-8
+set backspace=indent,eol,start
+set hidden
+set autoread
+set mouse=a
+set clipboard=unnamedplus
+set timeoutlen=500 ttimeoutlen=10
+set updatetime=250
+
+" Indentation
+set expandtab
+set tabstop=4 shiftwidth=4 softtabstop=4
+set autoindent smartindent
+set shiftround
+
+" Search
+set incsearch hlsearch
+set ignorecase smartcase
+
+" Splits
+set splitbelow splitright
+
+" Persistent undo; swap files kept out of project dirs
+let s:state = expand('~/.vim/state')
+if !isdirectory(s:state . '/undo') | call mkdir(s:state . '/undo', 'p', 0700) | endif
+if !isdirectory(s:state . '/swap') | call mkdir(s:state . '/swap', 'p', 0700) | endif
+set undofile
+let &undodir = s:state . '/undo//'
+let &directory = s:state . '/swap//'
+set nobackup nowritebackup
+
+" Keymaps
+let mapleader = ' '
+nnoremap <leader>h :nohlsearch<CR>
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+nnoremap j gj
+nnoremap k gk
+vnoremap < <gv
+vnoremap > >gv
+nnoremap Y y$
+
+augroup vimrc
+  autocmd!
+  autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
+  autocmd FileType yaml,json,sh,lua setlocal shiftwidth=2 tabstop=2 softtabstop=2
+  autocmd FileType make setlocal noexpandtab
+augroup END
